@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bree+Serif&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary-start: #2ED12E;
+  --color-primary-end: #1BA41B;
+  --color-primary: #2ED12E;
+  --color-primary-secondary: #000000;
+  --color-primary-500: #2ED12E;
+  --color-secondary-500: #000000;
+  --color-gray-50: #F3F7FF;
+  --color-gray-300: 209 213 219;
+  --font-primary: "Bree Serif", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Bree Serif", serif;
+  --spacing-0\.8: 0.2rem;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    background-color: #F3F7FF;
+  }
+
+  .fb-normal {
+    font-weight: 400;
+  }
+  
+  .fb {
+    font-weight: 700;
+  }
+
+  .statics {
+    border-radius: 0.375rem;
+  }
+
+  h1, h2, h3, h4, h5, h6, button, label {
+    font-family: var(--font-primary);
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  * {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  ._order_header_step_circle {
+    @apply w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold;
+  }
+
+  .shimmer-text {
+    background: linear-gradient(90deg, #2ED12E 0%, #1BA41B 50%, #2ED12E 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .arrow-move {
+    display: inline-block;
+    animation: arrow-move 1.5s infinite;
+    color: #2ED12E;
+    margin-left: 4px;
+  }
+
+  @keyframes arrow-move {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+  }
+
+  .gamename1 {
+    @apply text-white text-center rounded-b-md text-xs font-medium cursor-pointer;
+  }
+
+  .bg-gray-300 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(var(--color-gray-300) / var(--tw-bg-opacity));
+  }
+}
