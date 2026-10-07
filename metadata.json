@@ -1,0 +1,6 @@
+{
+  "name": "WarTopUp",
+  "description": "The No.1 Free Fire Diamond Top-Up Service in Bangladesh. Fast, safe, and trusted.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

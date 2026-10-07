@@ -1,0 +1,161 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - displayName: string (optional)
+    //   - email: string (required)
+    //   - photoURL: string (optional)
+    //   - balance: number (required)
+    //   - supportPin: string (optional)
+    //   - weeklySpent: number (optional)
+    //   - totalSpent: number (optional)
+    //   - totalOrder: number (optional)
+    //   - isVerified: boolean (optional)
+    //   - phone: string (optional)
+    //   - role: string (optional, 'admin' or 'user')
+    //
+    // Collection: orders
+    // Document ID: {orderId}
+    // Fields:
+    //   - userId: string (required)
+    //   - userName: string (optional)
+    //   - productId: string (required)
+    //   - productTitle: string (required)
+    //   - optionLabel: string (required)
+    //   - price: number (required)
+    //   - playerId: string (required)
+    //   - trxId: string (required)
+    //   - paymentMethod: string (required)
+    //   - status: string (required, 'Pending', 'Processing', 'Completed', 'Cancelled')
+    //   - createdAt: timestamp (required)
+    //   - completedAt: timestamp (optional)
+    //
+    // Collection: deposits
+    // Document ID: {depositId}
+    // Fields:
+    //   - userId: string (required)
+    //   - userName: string (optional)
+    //   - amount: number (required)
+    //   - method: string (required)
+    //   - trxId: string (required)
+    //   - status: string (required, 'Pending', 'Completed', 'Cancelled')
+    //   - createdAt: timestamp (required)
+    //   - completedAt: timestamp (optional)
+    //
+    // Collection: notices
+    // Document ID: {noticeId}
+    // Fields:
+    //   - text: string (required)
+    //   - isActive: boolean (required)
+    //
+    // Collection: products
+    // Document ID: {productId}
+    // Fields:
+    //   - title: string (required)
+    //   - imageUrl: string (required)
+    //   - category: string (required)
+    //   - options: array (optional)
+    //   - rules: array (optional)
+    //   - steps: array (optional)
+    //   - createdAt: timestamp (required)
+    //   - order: number (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "royp76432@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return hasOnlyAllowedFields(['uid', 'displayName', 'email', 'photoURL', 'balance', 'supportPin', 'weeklySpent', 'totalSpent', 'totalOrder', 'isVerified', 'phone', 'role']) &&
+             data.uid is string &&
+             data.email is string && isValidEmail(data.email) &&
+             data.balance is number && data.balance >= 0;
+    }
+
+    function isValidOrder(data) {
+      return hasOnlyAllowedFields(['userId', 'userName', 'productId', 'productTitle', 'optionLabel', 'price', 'playerId', 'trxId', 'paymentMethod', 'status', 'createdAt', 'completedAt']) &&
+             data.userId is string &&
+             data.productTitle is string &&
+             data.price is number && data.price >= 0 &&
+             data.status in ['Pending', 'Processing', 'Completed', 'Cancelled'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidDeposit(data) {
+      return hasOnlyAllowedFields(['userId', 'userName', 'amount', 'method', 'trxId', 'status', 'createdAt', 'completedAt']) &&
+             data.userId is string &&
+             data.amount is number && data.amount >= 0 &&
+             data.status in ['Pending', 'Completed', 'Cancelled'] &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && (isOwner(userId) && request.resource.data.role == 'user' || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && (isOwner(userId) && request.resource.data.role == resource.data.role && request.resource.data.balance == resource.data.balance || isAdmin());
+    }
+
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidOrder(request.resource.data) && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    match /deposits/{depositId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && isValidDeposit(request.resource.data) && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    match /notices/{noticeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

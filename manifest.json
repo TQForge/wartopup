@@ -1,0 +1,21 @@
+{
+  "short_name": "WarTopUp",
+  "icons": [
+    {
+      "src": "/upload/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/upload/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#F3F7FF",
+  "theme_color": "#2ED12E",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait"
+}

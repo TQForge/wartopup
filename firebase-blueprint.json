@@ -1,0 +1,133 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and wallet information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "balance": { "type": "number", "description": "Current wallet balance in Tk" },
+        "supportPin": { "type": "string" },
+        "weeklySpent": { "type": "number" },
+        "totalSpent": { "type": "number" },
+        "totalOrder": { "type": "number" },
+        "isVerified": { "type": "boolean" },
+        "phone": { "type": "string" }
+      },
+      "required": ["uid", "email", "balance"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Top-up order record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "productId": { "type": "string" },
+        "productTitle": { "type": "string" },
+        "optionLabel": { "type": "string" },
+        "price": { "type": "number" },
+        "playerId": { "type": "string" },
+        "trxId": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Processing", "Completed", "Cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "productId", "productTitle", "optionLabel", "price", "playerId", "trxId", "paymentMethod", "status", "createdAt"]
+    },
+    "Deposit": {
+      "title": "Deposit",
+      "description": "Wallet balance top-up request",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "amount": { "type": "number" },
+        "method": { "type": "string" },
+        "trxId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Completed", "Cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "method", "trxId", "status", "createdAt"]
+    },
+    "Notice": {
+      "title": "Notice",
+      "description": "Global notice bar content",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["text", "isActive"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Top-up product/game",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "number" },
+              "label": { "type": "string" },
+              "price": { "type": "number" },
+              "icon": { "type": "string" }
+            }
+          }
+        },
+        "rules": { "type": "array", "items": { "type": "string" } },
+        "steps": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "imageUrl", "category", "createdAt", "order"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Carousel banners",
+      "type": "object",
+      "properties": {
+        "imageUrl": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["imageUrl"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user profiles"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "All top-up orders"
+    },
+    "/deposits/{depositId}": {
+      "schema": "Deposit",
+      "description": "All wallet deposit requests"
+    },
+    "/notices/{noticeId}": {
+      "schema": "Notice",
+      "description": "Global notices"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Game products"
+    },
+    "/banners/{bannerId}": {
+      "schema": "Banner",
+      "description": "Home banners"
+    }
+  }
+}
